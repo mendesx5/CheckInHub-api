@@ -1,5 +1,7 @@
 package com.mendes.check_in_hub.enrollment;
 
+import com.mendes.check_in_hub.event.Event;
+import com.mendes.check_in_hub.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -20,11 +22,11 @@ public class Enrollment {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_id", nullable = false)
-    private Long event;
+    private Event event;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "participant_id", nullable = false)
-    private Long participant;
+    private User participant;
 
     @Column(nullable = false, unique = true)
     private String qrCodeToken;

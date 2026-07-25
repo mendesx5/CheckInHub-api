@@ -1,5 +1,7 @@
 package com.mendes.check_in_hub.checkin;
 
+import com.mendes.check_in_hub.enrollment.Enrollment;
+import com.mendes.check_in_hub.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -20,12 +22,12 @@ public class CheckIn {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "enrollment_id", nullable = false, unique = true)
-    private Long enrollment;
+    private Enrollment enrollment;
 
     private LocalDateTime checkInDateTime;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "validated_by_id")
-    private Long validateById;
+    private User validateById;
 
 }
