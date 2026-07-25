@@ -24,6 +24,7 @@ public class CheckIn {
     @JoinColumn(name = "enrollment_id", nullable = false, unique = true)
     private Enrollment enrollment;
 
+    @Column(name = "check_in_date_time")
     private LocalDateTime checkInDateTime;
 
     @ManyToOne(fetch = FetchType.LAZY)

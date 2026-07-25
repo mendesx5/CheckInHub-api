@@ -33,7 +33,7 @@ public class Event {
     private EventStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "organizador_id", nullable = false)
+    @JoinColumn(name = "organizer_id", nullable = false)
     private User organizer;
 
 }

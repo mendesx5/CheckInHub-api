@@ -8,7 +8,15 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "enrollments")
+@Table(
+        name = "enrollments",
+        uniqueConstraints = {
+            @UniqueConstraint(
+                    name = "uk_enrollment_event_user",
+                    columnNames = {"event_id", "participant_id"}
+            )
+        }
+)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -28,12 +36,13 @@ public class Enrollment {
     @JoinColumn(name = "participant_id", nullable = false)
     private User participant;
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "qr_code_token", nullable = false, unique = true)
     private String qrCodeToken;
 
     @Enumerated(EnumType.STRING)
     private EnrollmentStatus status;
 
+    @Column(name = "date_enrollment")
     private LocalDateTime dateEnrollment;
 
 }
