@@ -8,17 +8,17 @@ import jakarta.validation.constraints.Size;
 
 public record UserRequest(
         @NotBlank(message = "The name is mandatory")
-        @Size(max = 150, message = "O nome deve ter no máximo 150 caracteres")
+        @Size(max = 150, message = "The  title name have a maximum of 150 characters")
         String name,
 
-        @NotBlank(message = "O e-mail é obrigatório")
-        @Email(message = "Formato de e-mail inválido")
+        @NotBlank(message = "The email is mandatory")
+        @Email(message = "The format of email is invalid")
         String email,
 
-        @NotBlank(message = "A senha é obrigatória")
-        @Size(min = 6, message = "A senha deve ter no mínimo 6 caracteres")
+        @NotBlank(message = "The password is mandatory")
+        @Size(min = 6, message = "The  password name have a minimum of 6 characters")
         String password,
 
-        @NotNull(message = " O papel (role) do usuário é obrigatório")
+        @NotNull(message = "The user role is mandatory.")
         UserRole role
 ) {}
