@@ -29,6 +29,6 @@ public class CheckIn {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "validated_by_id")
-    private User validatedById;
+    private User validatedBy;
 
 }
