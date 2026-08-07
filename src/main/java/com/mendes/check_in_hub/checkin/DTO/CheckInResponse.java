@@ -20,7 +20,7 @@ public record CheckInResponse(
                 checkIn.getEnrollment().getParticipant().getName(),
                 checkIn.getEnrollment().getEvent().getTitle(),
                 checkIn.getCheckInDateTime(),
-                checkIn.getValidatedById() != null ? UserResponse.fromEntity(checkIn.getValidatedById()) : null
+                checkIn.getValidatedBy() != null ? UserResponse.fromEntity(checkIn.getValidatedBy()) : null
         );
     }
 }
