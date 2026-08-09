@@ -62,4 +62,15 @@ public class EventService {
         eventRepository.save(event);
     }
 
+    @Transactional
+    public List<EventResponse> findOrganizerEvents (Long organizerId) {
+        User user = userRepository.findById(organizerId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + organizerId));
+
+        return eventRepository.findByOrganizerId(organizerId)
+                .stream()
+                .map(EventResponse::fromEntity)
+                .toList();
+    }
+
 }

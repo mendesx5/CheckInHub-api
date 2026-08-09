@@ -41,4 +41,10 @@ public class EventController {
         return ResponseEntity.ok(eventResponse);
     }
 
+    @GetMapping("/organizer-events/{eventId}")
+    public ResponseEntity<List<EventResponse>> findByOrganizerId (@PathVariable Long eventId) {
+        List<EventResponse> eventResponse = eventService.findOrganizerEvents(eventId);
+        return ResponseEntity.ok(eventResponse);
+    }
+
 }
