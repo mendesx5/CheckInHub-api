@@ -43,7 +43,7 @@ public class EventController {
 
     @PutMapping("/publish/{eventId}")
     public ResponseEntity<EventResponse> publishedEvent (@PathVariable Long eventId) {
-        eventService.publishedEvent(eventId);
+        eventService.publishEvent(eventId);
         return ResponseEntity.ok().build();
     }
 

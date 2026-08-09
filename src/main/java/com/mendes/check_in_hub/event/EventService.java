@@ -54,7 +54,7 @@ public class EventService {
     }
 
     @Transactional
-    public void publishedEvent (Long eventId) {
+    public void publishEvent (Long eventId) {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new IllegalArgumentException("Event not found with id: " + eventId));
 
