@@ -31,7 +31,7 @@ public class EventController {
 
     @GetMapping("/{eventId}")
     public ResponseEntity<EventResponse> findByEventId (@PathVariable Long eventId) {
-        EventResponse eventResponse = eventService.findByEvendId(eventId);
+        EventResponse eventResponse = eventService.findByEventId(eventId);
         return ResponseEntity.ok(eventResponse);
     }
 

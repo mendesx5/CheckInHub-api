@@ -38,7 +38,7 @@ public class EventService {
     }
 
     @Transactional
-    public EventResponse findByEvendId (Long eventId) {
+    public EventResponse findByEventId (Long eventId) {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + eventId));
 
