@@ -41,6 +41,12 @@ public class EventController {
         return ResponseEntity.ok(eventResponse);
     }
 
+    @PutMapping("/publish/{eventId}")
+    public ResponseEntity<EventResponse> publishedEvent (@PathVariable Long eventId) {
+        eventService.publishedEvent(eventId);
+        return ResponseEntity.ok().build();
+    }
+
     @DeleteMapping("/{eventId}")
     public ResponseEntity<Void> deleteEvent (@PathVariable Long eventId) {
         eventService.cancelEvent(eventId);

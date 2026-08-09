@@ -54,6 +54,15 @@ public class EventService {
     }
 
     @Transactional
+    public void publishedEvent (Long eventId) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new IllegalArgumentException("Event not found with id: " + eventId));
+
+        event.setStatus(EventStatus.PUBLISHED);
+        eventRepository.save(event);
+    }
+
+    @Transactional
     public void cancelEvent (Long eventId) {
         Event event =  eventRepository.findById(eventId)
                 .orElseThrow(() -> new IllegalArgumentException("Event not found with id: " + eventId));
