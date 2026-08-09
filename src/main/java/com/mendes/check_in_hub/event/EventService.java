@@ -58,8 +58,10 @@ public class EventService {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new IllegalArgumentException("Event not found with id: " + eventId));
 
-        event.setStatus(EventStatus.PUBLISHED);
-        eventRepository.save(event);
+        if (event.getStatus() == EventStatus.DRAFT) {
+            event.setStatus(EventStatus.PUBLISHED);
+            eventRepository.save(event);
+        }
     }
 
     @Transactional
