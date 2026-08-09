@@ -41,6 +41,12 @@ public class EventController {
         return ResponseEntity.ok(eventResponse);
     }
 
+    @DeleteMapping("/{eventId}")
+    public ResponseEntity<Void> deleteEvent (@PathVariable Long eventId) {
+        eventService.cancelEvent(eventId);
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping("/organizer-events/{eventId}")
     public ResponseEntity<List<EventResponse>> findByOrganizerId (@PathVariable Long eventId) {
         List<EventResponse> eventResponse = eventService.findOrganizerEvents(eventId);
