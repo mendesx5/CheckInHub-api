@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/events")
@@ -19,7 +20,6 @@ public class EventController {
 
     @PostMapping
     public ResponseEntity<EventResponse> createEvent (@RequestBody @Valid EventRequest eventRequest) {
-
         EventResponse eventResponse = eventService.createEvent(eventRequest);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -27,7 +27,18 @@ public class EventController {
                 .buildAndExpand(eventResponse.id())
                 .toUri();
         return ResponseEntity.created(location).body(eventResponse);
+    }
 
+    @GetMapping("/{eventId}")
+    public ResponseEntity<EventResponse> findByEventId (@PathVariable Long eventId) {
+        EventResponse eventResponse = eventService.findByEvendId(eventId);
+        return ResponseEntity.ok(eventResponse);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<EventResponse>> findAllEvents () {
+        List<EventResponse> eventResponse = eventService.findAllEvents();
+        return ResponseEntity.ok(eventResponse);
     }
 
 }

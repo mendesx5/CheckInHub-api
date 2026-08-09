@@ -8,6 +8,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class EventService {
@@ -33,6 +35,22 @@ public class EventService {
         Event savedEvent = eventRepository.save(event);
 
         return EventResponse.fromEntity(savedEvent);
+    }
+
+    @Transactional
+    public EventResponse findByEvendId (Long eventId) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + eventId));
+
+        return EventResponse.fromEntity(event);
+    }
+
+    @Transactional
+    public List<EventResponse> findAllEvents () {
+        return eventRepository.findAll()
+                .stream()
+                .map(EventResponse::fromEntity)
+                .toList();
     }
 
 }
