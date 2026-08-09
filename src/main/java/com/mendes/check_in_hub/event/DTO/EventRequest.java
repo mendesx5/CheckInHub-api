@@ -20,5 +20,8 @@ public record EventRequest(
         String location,
 
         @Min(value = 1, message = "The minimum capacity is 1 participant")
-        int capacity
+        int capacity,
+
+        @NotNull(message = "The organizer ID is mandatory")
+        Long organizerId
 ) {}

@@ -8,8 +8,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 public class EventService {
@@ -17,11 +15,10 @@ public class EventService {
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
 
-    // Create
     @Transactional
-    public EventResponse createEvent (EventRequest request, Long organizerId) {
-        User organizer = userRepository.findById(organizerId)
-                .orElseThrow(() -> new IllegalArgumentException("Organizer not found with id: " + organizerId));
+    public EventResponse createEvent (EventRequest request) {
+        User organizer = userRepository.findById(request.organizerId())
+                .orElseThrow(() -> new IllegalArgumentException("Organizer not found with id: " + request.organizerId()));
 
         Event event = Event.builder()
                 .title(request.title())
