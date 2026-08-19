@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -79,5 +80,32 @@ public class EnrollmentService {
         return EnrollmentResponse.fromEntity(savedEnrollment);
 
     }
+
+    @Transactional
+    public EnrollmentResponse findByEnrollmentId (Long enrollmentId) {
+        Enrollment enrollment = enrollmentRepository.findById(enrollmentId)
+                .orElseThrow(() -> new RuntimeException("Enrollment not found with id: " + enrollmentId));
+
+        return EnrollmentResponse.fromEntity(enrollment);
+    }
+
+    @Transactional
+    public List<EnrollmentResponse> findAllEnrollments () {
+        return enrollmentRepository.findAll()
+                .stream()
+                .map(EnrollmentResponse::fromEntity)
+                .toList();
+    }
+
+    @Transactional
+    public void cancelEnrollment (Long enrollmentId) {
+        Enrollment enrollment = enrollmentRepository.findById(enrollmentId)
+                .orElseThrow(() -> new RuntimeException("Enrollment not found with id: " + enrollmentId));
+
+        enrollment.setStatus(EnrollmentStatus.CANCELED);
+        enrollmentRepository.save(enrollment);
+    }
+
+
 
 }
