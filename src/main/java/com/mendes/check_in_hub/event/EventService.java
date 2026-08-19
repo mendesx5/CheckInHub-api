@@ -4,6 +4,7 @@ import com.mendes.check_in_hub.event.DTO.EventRequest;
 import com.mendes.check_in_hub.event.DTO.EventResponse;
 import com.mendes.check_in_hub.user.User;
 import com.mendes.check_in_hub.user.UserRepository;
+import com.mendes.check_in_hub.user.UserRole;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,9 @@ public class EventService {
     public EventResponse createEvent (EventRequest request) {
         User organizer = userRepository.findById(request.organizerId())
                 .orElseThrow(() -> new IllegalArgumentException("Organizer not found with id: " + request.organizerId()));
+        if (organizer.getRole() != UserRole.ORGANIZER) {
+            throw new IllegalArgumentException("Organizer not found");
+        }
 
         Event event = Event.builder()
                 .title(request.title())
