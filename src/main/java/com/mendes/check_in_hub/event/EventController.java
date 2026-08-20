@@ -69,7 +69,7 @@ public class EventController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/organizer-events/{eventId}")
+    @GetMapping("/events/my-events")
     public ResponseEntity<List<EventResponse>> findMyEvents (Authentication authentication) {
         User organizer = (User) authentication.getPrincipal();
 
