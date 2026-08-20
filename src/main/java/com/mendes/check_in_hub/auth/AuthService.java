@@ -3,6 +3,7 @@ package com.mendes.check_in_hub.auth;
 import com.mendes.check_in_hub.auth.DTO.LoginRequest;
 import com.mendes.check_in_hub.auth.DTO.LoginResponse;
 import com.mendes.check_in_hub.security.JwtService;
+import com.mendes.check_in_hub.user.DTO.UserResponse;
 import com.mendes.check_in_hub.user.User;
 import com.mendes.check_in_hub.user.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +33,7 @@ public class AuthService {
 
         String token = jwtService.generateToken(user);
 
-        return new LoginResponse(token);
+        return new LoginResponse(token, UserResponse.fromEntity(user));
     }
 
 }
