@@ -1,10 +1,12 @@
 package com.mendes.check_in_hub.enrollment;
 
+import com.google.zxing.WriterException;
 import com.mendes.check_in_hub.enrollment.DTO.EnrollmentRequest;
 import com.mendes.check_in_hub.enrollment.DTO.EnrollmentResponse;
 import com.mendes.check_in_hub.event.Event;
 import com.mendes.check_in_hub.event.EventRepository;
 import com.mendes.check_in_hub.event.EventStatus;
+import com.mendes.check_in_hub.qrcode.QrCodeService;
 import com.mendes.check_in_hub.user.User;
 import com.mendes.check_in_hub.user.UserRepository;
 import com.mendes.check_in_hub.user.UserRole;
@@ -12,6 +14,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -23,6 +26,7 @@ public class EnrollmentService {
     private final EnrollmentRepository enrollmentRepository;
     private final UserRepository userRepository;
     private final EventRepository eventRepository;
+    private final QrCodeService qrCodeService;
 
     @Transactional
     public EnrollmentResponse createEnrollment (EnrollmentRequest request) {
@@ -106,6 +110,11 @@ public class EnrollmentService {
         enrollmentRepository.save(enrollment);
     }
 
+    public byte[] generateEnrollmentQRCode (Long enrollmentId) throws IOException, WriterException {
+        Enrollment enrollment = enrollmentRepository.findById(enrollmentId)
+                .orElseThrow(() -> new RuntimeException("Enrollment not found with id: " + enrollmentId));
 
+        return qrCodeService.generateQrCode(enrollment.getQrCodeToken());
+    }
 
 }

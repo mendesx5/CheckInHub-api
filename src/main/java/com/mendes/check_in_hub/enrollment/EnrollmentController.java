@@ -1,13 +1,16 @@
 package com.mendes.check_in_hub.enrollment;
 
+import com.google.zxing.WriterException;
 import com.mendes.check_in_hub.enrollment.DTO.EnrollmentRequest;
 import com.mendes.check_in_hub.enrollment.DTO.EnrollmentResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 
@@ -45,6 +48,12 @@ public class EnrollmentController {
     public ResponseEntity<Void> deleteEnrollment (@PathVariable Long enrollmentId) {
         enrollmentService.cancelEnrollment(enrollmentId);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping(value = "/{enrollmentId}/qrcode", produces = MediaType.IMAGE_PNG_VALUE)
+    public ResponseEntity<byte[]> getEnrollmentQRCode (@PathVariable Long enrollmentId) throws IOException, WriterException {
+        byte[] qrCode = enrollmentService.generateEnrollmentQRCode(enrollmentId);
+        return ResponseEntity.ok().contentType(MediaType.IMAGE_PNG).body(qrCode);
     }
 
 }
