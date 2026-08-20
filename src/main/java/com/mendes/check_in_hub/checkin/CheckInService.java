@@ -9,10 +9,12 @@ import com.mendes.check_in_hub.enrollment.EnrollmentStatus;
 import com.mendes.check_in_hub.event.EventRepository;
 import com.mendes.check_in_hub.user.User;
 import com.mendes.check_in_hub.user.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +25,7 @@ public class CheckInService {
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
 
+    @Transactional
     public CheckInResponse createCheckIn (CheckInRequest request) {
 
         String token = request.qrCodeToken();
@@ -58,6 +61,14 @@ public class CheckInService {
         CheckIn savedCheckIn = checkInRepository.save(checkIn);
         return CheckInResponse.fromEntity(savedCheckIn);
 
+    }
+
+    @Transactional
+    public List<CheckInResponse> findCheckInsByEvent (Long eventId) {
+        return checkInRepository.findByEnrollmentEventId(eventId)
+                .stream()
+                .map(CheckInResponse::fromEntity)
+                .toList();
     }
 
 }
