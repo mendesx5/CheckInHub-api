@@ -2,7 +2,7 @@ spring:
   application:
     name: check-in-hub
   datasource:
-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:checkinhub}
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5433}/${DB_NAME:checkinhub}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
   jpa:
@@ -12,15 +12,6 @@ spring:
     properties:
       hibernate:
         format_sql: false
-services:
-  postgres:
-    image: postgres:16
-    environment:
-      POSTGRES_DB: checkinhub
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    ports:
-      - "5432:5432"
 
 jwt:
   secret: ${JWT_SECRET}
