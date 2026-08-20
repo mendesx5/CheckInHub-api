@@ -22,11 +22,9 @@ public class CheckInService {
 
     private final CheckInRepository checkInRepository;
     private final EnrollmentRepository enrollmentRepository;
-    private final EventRepository eventRepository;
-    private final UserRepository userRepository;
 
     @Transactional
-    public CheckInResponse createCheckIn (CheckInRequest request) {
+    public CheckInResponse createCheckIn (CheckInRequest request, User validator) {
 
         String token = request.qrCodeToken();
 
@@ -43,9 +41,6 @@ public class CheckInService {
         if (alreadyCheckIn) {
             throw new RuntimeException("Check-in already completed");
         }
-
-        User validator = userRepository.findById(request.validatedById())
-                .orElseThrow(() -> new RuntimeException("Validator not found"));
 
         // Check if the user is the event organizer
         if (!enrollment.getEvent().getOrganizer().getId().equals(validator.getId())) {

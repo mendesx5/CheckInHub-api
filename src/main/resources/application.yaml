@@ -21,3 +21,7 @@ services:
       POSTGRES_PASSWORD: postgres
     ports:
       - "5432:5432"
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: ${JWT_EXPIRATION}

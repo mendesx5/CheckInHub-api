@@ -2,9 +2,11 @@ package com.mendes.check_in_hub.event;
 
 import com.mendes.check_in_hub.event.DTO.EventRequest;
 import com.mendes.check_in_hub.event.DTO.EventResponse;
+import com.mendes.check_in_hub.user.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -19,8 +21,13 @@ public class EventController {
     private final EventService eventService;
 
     @PostMapping
-    public ResponseEntity<EventResponse> createEvent (@RequestBody @Valid EventRequest eventRequest) {
-        EventResponse eventResponse = eventService.createEvent(eventRequest);
+    public ResponseEntity<EventResponse> createEvent (
+            @RequestBody @Valid EventRequest eventRequest,
+            Authentication authentication
+    ) {
+        User organizer = (User) authentication.getPrincipal();
+
+        EventResponse eventResponse = eventService.createEvent(eventRequest, organizer);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
@@ -42,21 +49,31 @@ public class EventController {
     }
 
     @PutMapping("/publish/{eventId}")
-    public ResponseEntity<EventResponse> publishedEvent (@PathVariable Long eventId) {
-        eventService.publishEvent(eventId);
+    public ResponseEntity<Void> publishedEvent (
+            @PathVariable Long eventId,
+            Authentication authentication
+    ) {
+        User organizer = (User) authentication.getPrincipal();
+        eventService.publishEvent(eventId, organizer);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{eventId}")
-    public ResponseEntity<Void> deleteEvent (@PathVariable Long eventId) {
-        eventService.cancelEvent(eventId);
+    public ResponseEntity<Void> cancelEvent (
+            @PathVariable Long eventId,
+            Authentication authentication
+    ) {
+        User organizer = (User) authentication.getPrincipal();
+
+        eventService.cancelEvent(eventId, organizer);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/organizer-events/{eventId}")
-    public ResponseEntity<List<EventResponse>> findByOrganizerId (@PathVariable Long eventId) {
-        List<EventResponse> eventResponse = eventService.findOrganizerEvents(eventId);
-        return ResponseEntity.ok(eventResponse);
+    public ResponseEntity<List<EventResponse>> findMyEvents (Authentication authentication) {
+        User organizer = (User) authentication.getPrincipal();
+
+        return ResponseEntity.ok(eventService.findOrganizerEvents(organizer.getId()));
     }
 
 }

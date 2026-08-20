@@ -29,12 +29,9 @@ public class EnrollmentService {
     private final QrCodeService qrCodeService;
 
     @Transactional
-    public EnrollmentResponse createEnrollment (EnrollmentRequest request) {
+    public EnrollmentResponse createEnrollment (EnrollmentRequest request, User participant) {
         Event event = eventRepository.findById(request.eventId())
                 .orElseThrow(() -> new RuntimeException("Event not found"));
-
-        User participant = userRepository.findById(request.participantId())
-                .orElseThrow(() -> new RuntimeException("Participant not found"));
 
         // Check if the user has the PARTICIPANT role.
         if (participant.getRole() != UserRole.PARTICIPANT) {

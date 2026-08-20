@@ -19,9 +19,8 @@ public class EventService {
     private final UserRepository userRepository;
 
     @Transactional
-    public EventResponse createEvent (EventRequest request) {
-        User organizer = userRepository.findById(request.organizerId())
-                .orElseThrow(() -> new IllegalArgumentException("Organizer not found with id: " + request.organizerId()));
+    public EventResponse createEvent (EventRequest request, User organizer) {
+
         if (organizer.getRole() != UserRole.ORGANIZER) {
             throw new IllegalArgumentException("Organizer not found");
         }
@@ -58,9 +57,13 @@ public class EventService {
     }
 
     @Transactional
-    public void publishEvent (Long eventId) {
+    public void publishEvent (Long eventId, User organizer) {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new IllegalArgumentException("Event not found with id: " + eventId));
+
+        if (!event.getOrganizer().getId().equals(organizer.getId())) {
+            throw new IllegalArgumentException("User is not the organizer of this event");
+        }
 
         if (event.getStatus() == EventStatus.DRAFT) {
             event.setStatus(EventStatus.PUBLISHED);
@@ -69,9 +72,13 @@ public class EventService {
     }
 
     @Transactional
-    public void cancelEvent (Long eventId) {
+    public void cancelEvent (Long eventId, User organizer) {
         Event event =  eventRepository.findById(eventId)
                 .orElseThrow(() -> new IllegalArgumentException("Event not found with id: " + eventId));
+
+        if (!event.getOrganizer().getId().equals(organizer.getId())) {
+            throw new RuntimeException("User is not the organizer of this event");
+        }
 
         event.setStatus(EventStatus.CANCELLED);
         eventRepository.save(event);

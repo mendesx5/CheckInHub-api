@@ -5,8 +5,5 @@ import jakarta.validation.constraints.NotNull;
 
 public record CheckInRequest(
         @NotBlank
-        String qrCodeToken,
-
-        @NotNull
-        Long validatedById
+        String qrCodeToken
 ) {}
