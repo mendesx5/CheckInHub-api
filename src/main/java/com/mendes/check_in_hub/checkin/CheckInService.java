@@ -38,7 +38,7 @@ public class CheckInService {
         // Check if check-in has already taken place.
         boolean alreadyCheckIn = checkInRepository.existsByEnrollmentId(enrollment.getId());
         if (alreadyCheckIn) {
-            throw new RuntimeException("Enrollment already exists");
+            throw new RuntimeException("Check-in already completed");
         }
 
         User validator = userRepository.findById(request.validatedById())

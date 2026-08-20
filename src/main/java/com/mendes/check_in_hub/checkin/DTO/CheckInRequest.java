@@ -1,9 +1,12 @@
 package com.mendes.check_in_hub.checkin.DTO;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public record CheckInRequest(
-        @NotBlank(message = "O token do QR Code é obrigatório")
+        @NotBlank
         String qrCodeToken,
+
+        @NotNull
         Long validatedById
 ) {}
