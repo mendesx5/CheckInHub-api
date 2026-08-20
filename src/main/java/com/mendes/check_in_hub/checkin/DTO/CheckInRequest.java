@@ -4,5 +4,6 @@ import jakarta.validation.constraints.NotBlank;
 
 public record CheckInRequest(
         @NotBlank(message = "O token do QR Code é obrigatório")
-        String qrCodeToken
+        String qrCodeToken,
+        Long validatedById
 ) {}
