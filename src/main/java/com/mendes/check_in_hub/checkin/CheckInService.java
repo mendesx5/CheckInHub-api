@@ -6,11 +6,9 @@ import com.mendes.check_in_hub.enrollment.Enrollment;
 import com.mendes.check_in_hub.enrollment.EnrollmentRepository;
 
 import com.mendes.check_in_hub.enrollment.EnrollmentStatus;
-import com.mendes.check_in_hub.event.Event;
 import com.mendes.check_in_hub.event.EventRepository;
 import com.mendes.check_in_hub.user.User;
 import com.mendes.check_in_hub.user.UserRepository;
-import com.mendes.check_in_hub.user.UserRole;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
