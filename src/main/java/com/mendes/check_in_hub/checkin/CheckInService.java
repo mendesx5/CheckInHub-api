@@ -6,9 +6,9 @@ import com.mendes.check_in_hub.enrollment.Enrollment;
 import com.mendes.check_in_hub.enrollment.EnrollmentRepository;
 
 import com.mendes.check_in_hub.enrollment.EnrollmentStatus;
+import com.mendes.check_in_hub.event.Event;
 import com.mendes.check_in_hub.event.EventRepository;
 import com.mendes.check_in_hub.user.User;
-import com.mendes.check_in_hub.user.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,6 +22,7 @@ public class CheckInService {
 
     private final CheckInRepository checkInRepository;
     private final EnrollmentRepository enrollmentRepository;
+    private final EventRepository eventRepository;
 
     @Transactional
     public CheckInResponse createCheckIn (CheckInRequest request, User validator) {
@@ -59,9 +60,17 @@ public class CheckInService {
     }
 
     @Transactional
-    public List<CheckInResponse> findCheckInsByEvent (Long eventId) {
-        return checkInRepository.findByEnrollmentEventId(eventId)
-                .stream()
+    public List<CheckInResponse> findCheckInsByEvent (Long eventId, User organizer) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new RuntimeException("Event not found"));
+
+        if (!event.getOrganizer().getId().equals(organizer.getId())) {
+            throw new RuntimeException("You are not allowed to view this event checkins");
+        }
+
+        List<CheckIn> checkIns = checkInRepository.findByEnrollmentEventId(eventId);
+
+        return checkIns.stream()
                 .map(CheckInResponse::fromEntity)
                 .toList();
     }

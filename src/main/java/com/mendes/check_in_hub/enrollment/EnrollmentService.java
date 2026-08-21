@@ -1,6 +1,7 @@
 package com.mendes.check_in_hub.enrollment;
 
 import com.google.zxing.WriterException;
+import com.mendes.check_in_hub.checkin.CheckInRepository;
 import com.mendes.check_in_hub.enrollment.DTO.EnrollmentRequest;
 import com.mendes.check_in_hub.enrollment.DTO.EnrollmentResponse;
 import com.mendes.check_in_hub.event.Event;
@@ -26,6 +27,7 @@ public class EnrollmentService {
     private final EnrollmentRepository enrollmentRepository;
     private final UserRepository userRepository;
     private final EventRepository eventRepository;
+    private final CheckInRepository checkInRepository;
     private final QrCodeService qrCodeService;
 
     @Transactional
@@ -99,19 +101,66 @@ public class EnrollmentService {
     }
 
     @Transactional
-    public void cancelEnrollment (Long enrollmentId) {
+    public List<EnrollmentResponse> findMyEnrollments (User participant) {
+        List<Enrollment> enrollments = enrollmentRepository.findByParticipantId(participant.getId());
+
+        return enrollments.stream()
+                .map(EnrollmentResponse::fromEntity)
+                .toList();
+    }
+
+    @Transactional
+    public List<EnrollmentResponse> findEnrollmentsByEvent (Long eventId, User organizer) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new RuntimeException("Event not found"));
+
+        if (!event.getOrganizer().getId().equals(organizer.getId())) {
+            throw new RuntimeException("You are not allowed to view this event enrollments");
+        }
+
+        List<Enrollment> enrollments = enrollmentRepository.findByEventId(eventId);
+
+        return enrollments.stream()
+                .map(EnrollmentResponse::fromEntity)
+                .toList();
+    }
+
+
+    @Transactional
+    public void cancelEnrollment (Long enrollmentId, User participant) {
         Enrollment enrollment = enrollmentRepository.findById(enrollmentId)
                 .orElseThrow(() -> new RuntimeException("Enrollment not found with id: " + enrollmentId));
+
+        if (!enrollment.getParticipant().getId().equals(participant.getId())) {
+            throw new RuntimeException("You are not allowed to cancel this enrollment");
+        }
+
+        if (enrollment.getStatus() == EnrollmentStatus.CANCELED) {
+            throw new RuntimeException("Enrollment is already canceled");
+        }
 
         enrollment.setStatus(EnrollmentStatus.CANCELED);
         enrollmentRepository.save(enrollment);
     }
 
-    public byte[] generateEnrollmentQRCode (Long enrollmentId) throws IOException, WriterException {
+    @Transactional
+    public byte[] generateEnrollmentQrCode (Long enrollmentId, User participant) throws IOException, WriterException {
         Enrollment enrollment = enrollmentRepository.findById(enrollmentId)
                 .orElseThrow(() -> new RuntimeException("Enrollment not found with id: " + enrollmentId));
 
-        return qrCodeService.generateQrCode(enrollment.getQrCodeToken());
+        if (!enrollment.getParticipant().getId().equals(participant.getId())) {
+            throw new RuntimeException("You are not allowed to access this QR Code");
+        }
+
+        if (enrollment.getStatus() == EnrollmentStatus.CANCELED) {
+            throw new RuntimeException("Canceled enrollment does not have a valid QR Code");
+        }
+
+        try {
+            return qrCodeService.generateQrCode(enrollment.getQrCodeToken());
+        } catch (Exception e) {
+            throw new RuntimeException("QR code generation failed");
+        }
     }
 
 }

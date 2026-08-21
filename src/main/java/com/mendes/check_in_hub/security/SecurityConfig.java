@@ -54,8 +54,20 @@ public class SecurityConfig {
                         .hasRole("ORGANIZER")
                         .requestMatchers(HttpMethod.POST, "/check-in")
                         .hasRole("ORGANIZER")
+                        .requestMatchers(HttpMethod.GET, "/enrollments/event/**")
+                        .hasRole("ORGANIZER")
+                        .requestMatchers(HttpMethod.GET, "/check-in/event/**"
+                        ).hasRole("ORGANIZER")
                         .requestMatchers(HttpMethod.POST, "/enrollments")
                         .hasRole("PARTICIPANT")
+                        .requestMatchers(HttpMethod.GET, "/enrollments/**")
+                        .hasRole("PARTICIPANT")
+                        .requestMatchers(HttpMethod.GET, "/enrollments/me")
+                        .hasRole("PARTICIPANT")
+                        .requestMatchers(HttpMethod.DELETE, "/enrollments/**")
+                        .hasRole("PARTICIPANT")
+                        .requestMatchers(HttpMethod.GET, "/enrollments/*/qrcode"
+                        ).hasRole("PARTICIPANT")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(
