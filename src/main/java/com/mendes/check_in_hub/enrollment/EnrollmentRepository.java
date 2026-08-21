@@ -20,6 +20,4 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
 
     List<Enrollment> findByEventId(Long eventId);
 
-    List<CheckIn> findByEnrollmentId(Long enrollmentId);
-
 }
