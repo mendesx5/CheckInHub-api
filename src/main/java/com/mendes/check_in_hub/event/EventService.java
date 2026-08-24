@@ -49,12 +49,16 @@ public class EventService {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new EventNotFoundException(eventId));
 
+        if (event.getStatus() != EventStatus.PUBLISHED) {
+            throw new EventNotFoundException(eventId);
+        }
+
         return EventResponse.fromEntity(event);
     }
 
     @Transactional
     public List<EventResponse> findAllEvents () {
-        return eventRepository.findAll()
+        return eventRepository.findByStatus(EventStatus.PUBLISHED)
                 .stream()
                 .map(EventResponse::fromEntity)
                 .toList();
