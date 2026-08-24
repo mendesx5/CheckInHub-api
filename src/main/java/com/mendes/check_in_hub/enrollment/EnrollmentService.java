@@ -1,15 +1,17 @@
 package com.mendes.check_in_hub.enrollment;
 
 import com.google.zxing.WriterException;
-import com.mendes.check_in_hub.checkin.CheckInRepository;
 import com.mendes.check_in_hub.enrollment.DTO.EnrollmentRequest;
 import com.mendes.check_in_hub.enrollment.DTO.EnrollmentResponse;
 import com.mendes.check_in_hub.event.Event;
 import com.mendes.check_in_hub.event.EventRepository;
 import com.mendes.check_in_hub.event.EventStatus;
+import com.mendes.check_in_hub.exception.BusinessRuleException;
+import com.mendes.check_in_hub.exception.EnrollmentNotFoundException;
+import com.mendes.check_in_hub.exception.EventNotFoundException;
+import com.mendes.check_in_hub.exception.UnauthorizedOperationException;
 import com.mendes.check_in_hub.qrcode.QrCodeService;
 import com.mendes.check_in_hub.user.User;
-import com.mendes.check_in_hub.user.UserRepository;
 import com.mendes.check_in_hub.user.UserRole;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -25,29 +27,27 @@ import java.util.UUID;
 public class EnrollmentService {
 
     private final EnrollmentRepository enrollmentRepository;
-    private final UserRepository userRepository;
     private final EventRepository eventRepository;
-    private final CheckInRepository checkInRepository;
     private final QrCodeService qrCodeService;
 
     @Transactional
     public EnrollmentResponse createEnrollment (EnrollmentRequest request, User participant) {
         Event event = eventRepository.findById(request.eventId())
-                .orElseThrow(() -> new RuntimeException("Event not found"));
+                .orElseThrow(() -> new EventNotFoundException(request.eventId()));
 
         // Check if the user has the PARTICIPANT role.
         if (participant.getRole() != UserRole.PARTICIPANT) {
-            throw new RuntimeException("Participant not allowed to enroll");
+            throw new BusinessRuleException("Only participants can enroll in events");
         }
 
         // Check if the event is PUBLISHED.
         if (event.getStatus() != EventStatus.PUBLISHED) {
-            throw new RuntimeException("Event is not open for enrollment");
+            throw new BusinessRuleException("Event is not open for enrollment");
         }
 
         // Check if the event date is in the future.
         if (event.getDateTime().isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("This event has already passed");
+            throw new BusinessRuleException("This event has already passed");
         }
 
         // Check if a registration for this participant already exists for the event.
@@ -56,7 +56,7 @@ public class EnrollmentService {
                 participant.getId()
         );
         if (alreadyEnrolled) {
-            throw new RuntimeException("This event has already been enrolled");
+                throw new BusinessRuleException("Participant is already enrolled in this event");
         }
 
         // Count CONFIRMED registrations and compare with capacity.
@@ -65,7 +65,7 @@ public class EnrollmentService {
                 EnrollmentStatus.CONFIRMED
         );
         if  (confirmedEnrollments >= event.getCapacity()) {
-            throw new RuntimeException("This event is already fully booked");
+            throw new BusinessRuleException("Event is fully booked");
         }
 
         // Generate token
@@ -87,7 +87,7 @@ public class EnrollmentService {
     @Transactional
     public EnrollmentResponse findByEnrollmentId (Long enrollmentId) {
         Enrollment enrollment = enrollmentRepository.findById(enrollmentId)
-                .orElseThrow(() -> new RuntimeException("Enrollment not found with id: " + enrollmentId));
+                .orElseThrow(() -> new EnrollmentNotFoundException(enrollmentId));
 
         return EnrollmentResponse.fromEntity(enrollment);
     }
@@ -112,10 +112,10 @@ public class EnrollmentService {
     @Transactional
     public List<EnrollmentResponse> findEnrollmentsByEvent (Long eventId, User organizer) {
         Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new RuntimeException("Event not found"));
+                .orElseThrow(() -> new EventNotFoundException(eventId));
 
         if (!event.getOrganizer().getId().equals(organizer.getId())) {
-            throw new RuntimeException("You are not allowed to view this event enrollments");
+            throw new UnauthorizedOperationException("You are not allowed to view this event enrollments");
         }
 
         List<Enrollment> enrollments = enrollmentRepository.findByEventId(eventId);
@@ -129,14 +129,14 @@ public class EnrollmentService {
     @Transactional
     public void cancelEnrollment (Long enrollmentId, User participant) {
         Enrollment enrollment = enrollmentRepository.findById(enrollmentId)
-                .orElseThrow(() -> new RuntimeException("Enrollment not found with id: " + enrollmentId));
+                .orElseThrow(() -> new EnrollmentNotFoundException(enrollmentId));
 
         if (!enrollment.getParticipant().getId().equals(participant.getId())) {
-            throw new RuntimeException("You are not allowed to cancel this enrollment");
+            throw new UnauthorizedOperationException("You are not allowed to cancel this enrollment");
         }
 
         if (enrollment.getStatus() == EnrollmentStatus.CANCELED) {
-            throw new RuntimeException("Enrollment is already canceled");
+            throw new BusinessRuleException("Enrollment is already canceled");
         }
 
         enrollment.setStatus(EnrollmentStatus.CANCELED);
@@ -146,14 +146,14 @@ public class EnrollmentService {
     @Transactional
     public byte[] generateEnrollmentQrCode (Long enrollmentId, User participant) throws IOException, WriterException {
         Enrollment enrollment = enrollmentRepository.findById(enrollmentId)
-                .orElseThrow(() -> new RuntimeException("Enrollment not found with id: " + enrollmentId));
+                .orElseThrow(() -> new EnrollmentNotFoundException(enrollmentId));
 
         if (!enrollment.getParticipant().getId().equals(participant.getId())) {
-            throw new RuntimeException("You are not allowed to access this QR Code");
+            throw new UnauthorizedOperationException("You are not allowed to access this QR Code");
         }
 
         if (enrollment.getStatus() == EnrollmentStatus.CANCELED) {
-            throw new RuntimeException("Canceled enrollment does not have a valid QR Code");
+            throw new BusinessRuleException("Canceled enrollment does not have a valid QR Code");
         }
 
         try {

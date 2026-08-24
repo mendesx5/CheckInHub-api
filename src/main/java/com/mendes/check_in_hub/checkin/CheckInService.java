@@ -8,6 +8,9 @@ import com.mendes.check_in_hub.enrollment.EnrollmentRepository;
 import com.mendes.check_in_hub.enrollment.EnrollmentStatus;
 import com.mendes.check_in_hub.event.Event;
 import com.mendes.check_in_hub.event.EventRepository;
+import com.mendes.check_in_hub.exception.BusinessRuleException;
+import com.mendes.check_in_hub.exception.EventNotFoundException;
+import com.mendes.check_in_hub.exception.UnauthorizedOperationException;
 import com.mendes.check_in_hub.user.User;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -30,22 +33,22 @@ public class CheckInService {
         String token = request.qrCodeToken();
 
         Enrollment enrollment = enrollmentRepository.findByQrCodeToken(token)
-                .orElseThrow(() -> new RuntimeException("Invalid QR Code"));
+                .orElseThrow(() -> new BusinessRuleException("Invalid QR Code"));
 
         // Check if the enrollment is confirmed.
         if (enrollment.getStatus() != EnrollmentStatus.CONFIRMED) {
-            throw new RuntimeException("Invalid Enrollment");
+            throw new BusinessRuleException("Enrollment is not confirmed");
         }
 
         // Check if check-in has already taken place.
         boolean alreadyCheckIn = checkInRepository.existsByEnrollmentId(enrollment.getId());
         if (alreadyCheckIn) {
-            throw new RuntimeException("Check-in already completed");
+            throw new BusinessRuleException("Check-in already completed");
         }
 
         // Check if the user is the event organizer
         if (!enrollment.getEvent().getOrganizer().getId().equals(validator.getId())) {
-            throw new RuntimeException("User not allowed to validate check-in");
+            throw new UnauthorizedOperationException("User not allowed to validate check-in");
         }
 
         CheckIn checkIn = CheckIn.builder()
@@ -62,10 +65,10 @@ public class CheckInService {
     @Transactional
     public List<CheckInResponse> findCheckInsByEvent (Long eventId, User organizer) {
         Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new RuntimeException("Event not found"));
+                .orElseThrow(() -> new EventNotFoundException(eventId));
 
         if (!event.getOrganizer().getId().equals(organizer.getId())) {
-            throw new RuntimeException("You are not allowed to view this event checkins");
+            throw new UnauthorizedOperationException("You are not allowed to view this event checkins");
         }
 
         List<CheckIn> checkIns = checkInRepository.findByEnrollmentEventId(eventId);

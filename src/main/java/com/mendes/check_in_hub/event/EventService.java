@@ -2,6 +2,9 @@ package com.mendes.check_in_hub.event;
 
 import com.mendes.check_in_hub.event.DTO.EventRequest;
 import com.mendes.check_in_hub.event.DTO.EventResponse;
+import com.mendes.check_in_hub.exception.EventNotFoundException;
+import com.mendes.check_in_hub.exception.UnauthorizedOperationException;
+import com.mendes.check_in_hub.exception.UserNotFoundException;
 import com.mendes.check_in_hub.user.User;
 import com.mendes.check_in_hub.user.UserRepository;
 import com.mendes.check_in_hub.user.UserRole;
@@ -43,7 +46,7 @@ public class EventService {
     @Transactional
     public EventResponse findByEventId (Long eventId) {
         Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + eventId));
+                .orElseThrow(() -> new EventNotFoundException(eventId));
 
         return EventResponse.fromEntity(event);
     }
@@ -59,10 +62,10 @@ public class EventService {
     @Transactional
     public void publishEvent (Long eventId, User organizer) {
         Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new IllegalArgumentException("Event not found with id: " + eventId));
+                .orElseThrow(() -> new EventNotFoundException(eventId));
 
         if (!event.getOrganizer().getId().equals(organizer.getId())) {
-            throw new IllegalArgumentException("User is not the organizer of this event");
+            throw new UnauthorizedOperationException("User is not the organizer of this event");
         }
 
         if (event.getStatus() == EventStatus.DRAFT) {
@@ -74,10 +77,10 @@ public class EventService {
     @Transactional
     public void cancelEvent (Long eventId, User organizer) {
         Event event =  eventRepository.findById(eventId)
-                .orElseThrow(() -> new IllegalArgumentException("Event not found with id: " + eventId));
+                .orElseThrow(() -> new EventNotFoundException(eventId));
 
         if (!event.getOrganizer().getId().equals(organizer.getId())) {
-            throw new RuntimeException("User is not the organizer of this event");
+            throw new UnauthorizedOperationException("User is not the organizer of this event");
         }
 
         event.setStatus(EventStatus.CANCELLED);
@@ -87,7 +90,7 @@ public class EventService {
     @Transactional
     public List<EventResponse> findOrganizerEvents (Long organizerId) {
         User user = userRepository.findById(organizerId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + organizerId));
+                .orElseThrow(() -> new UserNotFoundException(organizerId));
 
         return eventRepository.findByOrganizerId(organizerId)
                 .stream()
