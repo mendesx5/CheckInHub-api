@@ -16,7 +16,7 @@ public record UserRequest(
         String email,
 
         @NotBlank(message = "The password is mandatory")
-        @Size(min = 6, message = "The  password name have a minimum of 6 characters")
+        @Size(min = 6, max = 100, message = "The  password name have a minimum of 6 characters")
         String password,
 
         @NotNull(message = "The user role is mandatory.")

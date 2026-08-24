@@ -19,6 +19,6 @@ public record EventRequest(
         @Size(max = 255, message = "The  location must have a maximum of 255 characters")
         String location,
 
-        @Min(value = 1, message = "The minimum capacity is 1 participant")
+        @Positive(message = "The minimum capacity is 1 participant")
         int capacity
 ) {}
