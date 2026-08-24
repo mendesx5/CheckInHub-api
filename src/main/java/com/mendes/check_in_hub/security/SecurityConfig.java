@@ -47,27 +47,37 @@ public class SecurityConfig {
                         SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(auth -> auth
+                        // Public
                         .requestMatchers("/auth/**", "/users").permitAll()
+                        // EVENTS - Organizer
                         .requestMatchers(HttpMethod.POST, "/events")
                         .hasRole("ORGANIZER")
-                        .requestMatchers(HttpMethod.PUT, "/events/publish/**")
+                        .requestMatchers(HttpMethod.PUT, "/events/**")
                         .hasRole("ORGANIZER")
-                        .requestMatchers(HttpMethod.POST, "/check-in")
+                        .requestMatchers(HttpMethod.DELETE, "/events/**")
                         .hasRole("ORGANIZER")
+                        .requestMatchers(HttpMethod.GET, "/events/my-events")
+                        .hasRole("ORGANIZER")
+                        // ENROLLMENTS - Organizer
                         .requestMatchers(HttpMethod.GET, "/enrollments/event/**")
                         .hasRole("ORGANIZER")
-                        .requestMatchers(HttpMethod.GET, "/check-in/event/**"
-                        ).hasRole("ORGANIZER")
+                        // CHECK-IN - Organizer
+                        .requestMatchers(HttpMethod.POST, "/check-in")
+                        .hasRole("ORGANIZER")
+                        .requestMatchers(HttpMethod.GET, "/check-in/event/**")
+                        .hasRole("ORGANIZER")
+                        // ENROLLMENTS - Participant
                         .requestMatchers(HttpMethod.POST, "/enrollments")
-                        .hasRole("PARTICIPANT")
-                        .requestMatchers(HttpMethod.GET, "/enrollments/**")
                         .hasRole("PARTICIPANT")
                         .requestMatchers(HttpMethod.GET, "/enrollments/me")
                         .hasRole("PARTICIPANT")
                         .requestMatchers(HttpMethod.DELETE, "/enrollments/**")
                         .hasRole("PARTICIPANT")
-                        .requestMatchers(HttpMethod.GET, "/enrollments/*/qrcode"
-                        ).hasRole("PARTICIPANT")
+                        .requestMatchers(HttpMethod.GET, "/enrollments/*/qrcode")
+                        .hasRole("PARTICIPANT")
+                        // Any authenticated user
+                        .requestMatchers(HttpMethod.GET, "/events/**")
+                        .authenticated()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(
