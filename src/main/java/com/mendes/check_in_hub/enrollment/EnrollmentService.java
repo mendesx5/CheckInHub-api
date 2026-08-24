@@ -159,7 +159,7 @@ public class EnrollmentService {
         try {
             return qrCodeService.generateQrCode(enrollment.getQrCodeToken());
         } catch (Exception e) {
-            throw new RuntimeException("QR code generation failed");
+            throw new BusinessRuleException("QR code generation failed");
         }
     }
 

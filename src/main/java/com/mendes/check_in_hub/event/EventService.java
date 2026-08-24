@@ -2,6 +2,7 @@ package com.mendes.check_in_hub.event;
 
 import com.mendes.check_in_hub.event.DTO.EventRequest;
 import com.mendes.check_in_hub.event.DTO.EventResponse;
+import com.mendes.check_in_hub.exception.BusinessRuleException;
 import com.mendes.check_in_hub.exception.EventNotFoundException;
 import com.mendes.check_in_hub.exception.UnauthorizedOperationException;
 import com.mendes.check_in_hub.exception.UserNotFoundException;
@@ -25,7 +26,7 @@ public class EventService {
     public EventResponse createEvent (EventRequest request, User organizer) {
 
         if (organizer.getRole() != UserRole.ORGANIZER) {
-            throw new IllegalArgumentException("Organizer not found");
+            throw new BusinessRuleException("Only organizers can create events");
         }
 
         Event event = Event.builder()
