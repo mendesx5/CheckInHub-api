@@ -10,69 +10,68 @@ import java.time.LocalDateTime;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(EventNotFoundException.class)
-    public ResponseEntity<ApiError> handleEventNotFound(EventNotFoundException e) {
-        ApiError error = new ApiError(
-                HttpStatus.NOT_FOUND.value(),
-                HttpStatus.NOT_FOUND.getReasonPhrase(),
-                e.getMessage(),
+    private ResponseEntity<ApiError> buildResponse(
+            HttpStatus status,
+            String message
+    ) {
+        ApiError apiError = new ApiError(
+                status.value(),
+                status.getReasonPhrase(),
+                message,
                 LocalDateTime.now()
         );
+
         return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
-                .body(error);
+                .status(status)
+                .body(apiError);
+    }
+
+    @ExceptionHandler(EventNotFoundException.class)
+    public ResponseEntity<ApiError> handleEventNotFound(EventNotFoundException e) {
+        return buildResponse(
+                HttpStatus.NOT_FOUND,
+                e.getMessage()
+        );
     }
 
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<ApiError> handleUserNotFound(UserNotFoundException e) {
-        ApiError error = new ApiError(
-                HttpStatus.NOT_FOUND.value(),
-                HttpStatus.NOT_FOUND.getReasonPhrase(),
-                e.getMessage(),
-                LocalDateTime.now()
+        return buildResponse(
+                HttpStatus.NOT_FOUND,
+                e.getMessage()
         );
-        return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
-                .body(error);
     }
 
     @ExceptionHandler(EnrollmentNotFoundException.class)
     public ResponseEntity<ApiError> handleEnrollmentNotFound(EnrollmentNotFoundException e) {
-        ApiError error = new ApiError(
-                HttpStatus.NOT_FOUND.value(),
-                HttpStatus.NOT_FOUND.getReasonPhrase(),
-                e.getMessage(),
-                LocalDateTime.now()
+        return buildResponse(
+                HttpStatus.NOT_FOUND,
+                e.getMessage()
         );
-        return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
-                .body(error);
     }
 
     @ExceptionHandler(UnauthorizedOperationException.class)
     public ResponseEntity<ApiError> handleUnauthorizedOperation(UnauthorizedOperationException e) {
-        ApiError error = new ApiError(
-                HttpStatus.FORBIDDEN.value(),
-                HttpStatus.FORBIDDEN.getReasonPhrase(),
-                e.getMessage(),
-                LocalDateTime.now()
+        return buildResponse(
+                HttpStatus.FORBIDDEN,
+                e.getMessage()
         );
-        return ResponseEntity
-                .status(HttpStatus.FORBIDDEN)
-                .body(error);
     }
 
     @ExceptionHandler(BusinessRuleException.class)
     public ResponseEntity<ApiError> handleBusinessRule(BusinessRuleException e) {
-        ApiError error = new ApiError(
-                HttpStatus.BAD_REQUEST.value(),
-                HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                e.getMessage(),
-                LocalDateTime.now()
+        return buildResponse(
+                HttpStatus.BAD_REQUEST,
+                e.getMessage()
         );
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(error);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiError> handleGenericException(Exception e) {
+        return buildResponse(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "An unexpected error occurred"
+        );
     }
 
 }
