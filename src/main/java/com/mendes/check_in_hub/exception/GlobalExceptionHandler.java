@@ -2,6 +2,7 @@ package com.mendes.check_in_hub.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -24,6 +25,21 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(status)
                 .body(apiError);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiError> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+        String message = e.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                .findFirst()
+                .orElse("Invalid data");
+
+        return buildResponse(
+                HttpStatus.BAD_REQUEST,
+                message
+        );
     }
 
     @ExceptionHandler(EventNotFoundException.class)
