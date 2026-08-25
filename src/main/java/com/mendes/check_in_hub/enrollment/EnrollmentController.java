@@ -4,6 +4,8 @@ import com.google.zxing.WriterException;
 import com.mendes.check_in_hub.enrollment.DTO.EnrollmentRequest;
 import com.mendes.check_in_hub.enrollment.DTO.EnrollmentResponse;
 import com.mendes.check_in_hub.user.User;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.util.List;
 
+@Tag(name = "Enrollments", description = "Enrollment management endpoints")
 @RestController
 @RequestMapping("/enrollments")
 @RequiredArgsConstructor
@@ -21,8 +24,9 @@ public class EnrollmentController {
 
     private final EnrollmentService enrollmentService;
 
+    @Operation(summary = "Create enrollment", description = "Create a new enrollment")
     @PostMapping
-    public ResponseEntity<EnrollmentResponse> enrollment(
+    public ResponseEntity<EnrollmentResponse> createEnrollment(
             @Valid @RequestBody EnrollmentRequest request,
             Authentication authentication
     ) {
@@ -69,7 +73,7 @@ public class EnrollmentController {
     }
 
     @DeleteMapping("/{enrollmentId}")
-    public ResponseEntity<Void> deleteEnrollment (
+    public ResponseEntity<Void> cancelEnrollment (
             @PathVariable Long enrollmentId,
             Authentication authentication
     ) {

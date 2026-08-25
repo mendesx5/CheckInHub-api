@@ -48,7 +48,7 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                         // Public
-                        .requestMatchers("/auth/**", "/users").permitAll()
+                        .requestMatchers("/auth/**", "/users", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         // EVENTS - Organizer
                         .requestMatchers(HttpMethod.POST, "/events")
                         .hasRole("ORGANIZER")
