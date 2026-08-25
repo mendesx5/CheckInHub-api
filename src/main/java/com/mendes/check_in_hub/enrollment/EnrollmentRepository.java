@@ -1,6 +1,5 @@
 package com.mendes.check_in_hub.enrollment;
 
-import com.mendes.check_in_hub.checkin.CheckIn;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

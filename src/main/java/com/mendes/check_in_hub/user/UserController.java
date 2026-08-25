@@ -1,6 +1,5 @@
 package com.mendes.check_in_hub.user;
 
-
 import com.mendes.check_in_hub.user.DTO.UserRequest;
 import com.mendes.check_in_hub.user.DTO.UserResponse;
 import jakarta.validation.Valid;
@@ -19,7 +18,6 @@ import java.net.URI;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final UserRepository userRepository;
     private final UserService userService;
 
     @PostMapping
