@@ -25,22 +25,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/**
- * Exercises the full CheckInHub flow against a real Postgres database
- * (via Testcontainers) instead of mocked repositories:
- *
- * register organizer & participant -> login both -> organizer creates
- * and publishes an event -> participant enrolls (gets a QR token) ->
- * organizer checks that enrollment in -> a second check-in with the
- * same token must be rejected as a business rule violation.
- *
- * This is the kind of coverage the pure-Mockito unit tests can't give:
- * real Flyway migrations, real constraints, real Spring Security filter
- * chain, everything wired together.
- */
 @SpringBootTest
 @AutoConfigureMockMvc
-@Import(TestcontainersConfig.class)
+@Import(TestContainersConfig.class)
 @ActiveProfiles("test")
 class CheckInFlowIntegrationTest {
 
