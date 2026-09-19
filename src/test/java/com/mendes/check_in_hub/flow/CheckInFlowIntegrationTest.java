@@ -3,7 +3,7 @@ package com.mendes.check_in_hub.flow;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mendes.check_in_hub.auth.DTO.LoginRequest;
 import com.mendes.check_in_hub.checkin.DTO.CheckInRequest;
-import com.mendes.check_in_hub.config.TestcontainersConfig;
+import com.mendes.check_in_hub.config.TestContainersConfig;
 import com.mendes.check_in_hub.enrollment.DTO.EnrollmentRequest;
 import com.mendes.check_in_hub.event.DTO.EventRequest;
 import com.mendes.check_in_hub.user.DTO.UserRequest;

@@ -1,8 +1,10 @@
 package com.mendes.check_in_hub;
 
-import org.junit.jupiter.api.Disabled;
+import com.mendes.check_in_hub.config.TestContainersConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
 @Import(TestContainersConfig.class)
